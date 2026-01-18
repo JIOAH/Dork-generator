@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Google Dork Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --primary:#2563eb;
+  --success:#16a34a;
+  --border:#1f2937;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:20px;
+  font-family:Inter,system-ui,sans-serif;
+  background:linear-gradient(180deg,#020617,#0f172a);
+  color:var(--text);
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  background:var(--card);
+  padding:24px;
+  border-radius:16px;
+  border:1px solid var(--border);
+}
+h1{margin:0}
+.badge{
+  margin-top:6px;
+  display:inline-block;
+  background:rgba(34,197,94,.15);
+  color:#22c55e;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+.section{margin-top:26px}
+.section h2{
+  font-size:15px;
+  color:#c7d2fe;
+  margin-bottom:12px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+}
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#020617;
+  color:var(--text);
+}
+textarea{
+  min-height:120px;
+  font-family:ui-monospace,monospace;
+}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+  background:#334155;
+  color:#fff;
+}
+.generate{background:var(--primary)}
+.search{background:var(--success)}
+.reset{background:#1f2937;color:var(--muted)}
+footer{
+  margin-top:30px;
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <h1>Advanced Dork Generator</h1>
+  <span class="badge">OSINT & Research Tool</span>
+</header>
+
+<div class="section">
+<h2>Search Engine</h2>
+<div class="grid">
+  <div>
+    <label>Engine</label>
+    <select id="engine">
+      <option value="google">Google</option>
+      <option value="duckduckgo">DuckDuckGo</option>
+      <option value="bing">Bing</option>
+      <option value="yandex">Yandex</option>
+    </select>
+  </div>
+</div>
+</div>
+
+<div class="section">
+<h2>Search Filters</h2>
+<div class="grid">
+  <div><label>Site</label><input id="site" placeholder="example.com"></div>
+  <div><label>Filetype</label>
+    <select id="filetype">
+      <option value="">-- pilih --</option>
+      <option>pdf</option><option>docx</option><option>xls</option>
+      <option>txt</option><option>sql</option><option>env</option>
+      <option>py</option><option>html</option><option>sh</option>
+      <option>exe</option><option>yaml</option><option>yml</option>
+    </select>
+  </div>
+  <div><label>After Date</label><input type="date" id="after"></div>
+  <div><label>Before Date</label><input type="date" id="before"></div>
+  <div><label>In URL</label><input id="inurl" placeholder="admin"></div>
+  <div><label>In Title</label><input id="intitle" placeholder="login"></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Text Operators</h2>
+<div class="grid">
+  <div><label>In Text</label><input id="intext"></div>
+  <div><label>All In Text</label><input id="allintext"></div>
+  <div><label>Exact Text</label><input id="text"></div>
+  <div><label>Exclude Text</label><input id="extext"></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Quick Presets</h2>
+<div class="actions">
+  <button onclick="presetAdmin()">Admin</button>
+  <button onclick="presetLeak()">Leak</button>
+  <button onclick="presetBackup()">Backup</button>
+  <button onclick="presetConfig()">Config</button>
+</div>
+</div>
+
+<div class="section actions">
+  <button class="generate" onclick="generateDork()">Generate</button>
+  <button class="search" onclick="searchEngine()">Search</button>
+  <button onclick="searchAll()">Search ALL</button>
+  <button class="reset" onclick="resetForm()">Reset</button>
+</div>
+
+<div class="section">
+<h2>Generated Dork</h2>
+<textarea id="output" readonly></textarea>
+</div>
+
+<footer>
+© 2025 · Ethical OSINT Usage Only
+</footer>
+
+</div>
+
+<script>
+const val=id=>document.getElementById(id).value.trim()
+
+function generateDork(){
+  let d=[]
+  if(val('site')) d.push(`site:${val('site')}`)
+  if(val('filetype')) d.push(`filetype:${val('filetype')}`)
+  if(val('after')) d.push(`after:${val('after')}`)
+  if(val('before')) d.push(`before:${val('before')}`)
+  if(val('inurl')) d.push(`inurl:${val('inurl')}`)
+  if(val('intitle')) d.push(`intitle:${val('intitle')}`)
+  if(val('intext')) d.push(`intext:"${val('intext')}"`)
+  if(val('allintext')) d.push(`allintext:"${val('allintext')}"`)
+  if(val('text')) d.push(`"${val('text')}"`)
+  if(val('extext')) d.push(`-"${val('extext')}"`)
+  output.value=d.join(' ')
+}
+
+const engines=q=>({
+  google:`https://www.google.com/search?q=${q}`,
+  duckduckgo:`https://duckduckgo.com/?q=${q}`,
+  bing:`https://www.bing.com/search?q=${q}`,
+  yandex:`https://yandex.com/search/?text=${q}`
+})
+
+function searchEngine(){
+  generateDork()
+  const q=encodeURIComponent(output.value)
+  if(!q) return alert('Dork kosong')
+  window.open(engines(q)[engine.value],'_blank')
+}
+
+function searchAll(){
+  generateDork()
+  const q=encodeURIComponent(output.value)
+  if(!q) return alert('Dork kosong')
+  Object.values(engines(q)).forEach(u=>window.open(u,'_blank'))
+}
+
+function resetForm(){
+  document.querySelectorAll('input,select,textarea').forEach(e=>e.value='')
+}
+
+function presetAdmin(){
+  resetForm(); inurl.value='admin'; intitle.value='login'; generateDork()
+}
+function presetLeak(){
+  resetForm(); intext.value='password token secret'; generateDork()
+}
+function presetBackup(){
+  resetForm(); filetype.value='sql'; inurl.value='backup'; generateDork()
+}
+function presetConfig(){
+  resetForm(); filetype.value='env'; intext.value='DB_PASSWORD'; generateDork()
+}
+</script>
+
+</body>
+</html>
